@@ -1,16 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
+import { addTodoThunk, deleteTodoThunk, fetchTodoThunk } from "./operations";
 
 const initialState = {
-	items: [
-		{ id: 1, text: 'Hello react', completed: false },
-		{ id: 2, text: 'Hello redux', completed: false },
-	],
-	loading: false,
-	error: null,
-}
+  items: [],
+  loading: false,
+  error: null,
+};
 
 const slice = createSlice({
-	name: 'todos',
-	initialState,
-})
-export const todoReducer = slice.reducer
+  name: "todos",
+  initialState,
+  reducers: {
+    addTodo: (state, action) => {
+      state.items.push(action.payload);
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTodoThunk.fulfilled, (state, action) => {
+        state.items = action.payload;
+      })
+      .addCase(addTodoThunk.fulfilled, (state, action) => {
+        state.items.push(action.payload);
+      })
+      .addCase(deleteTodoThunk.fulfilled, (state, action) => {
+        state.items = state.items.filter(
+          (todo) => todo.id !== action.payload.id
+        );
+      });
+  },
+});
+export const todoReducer = slice.reducer;
